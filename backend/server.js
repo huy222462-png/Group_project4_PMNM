@@ -1,16 +1,13 @@
-// server.js
-const express = require("express");
+const express = require('express');
 const app = express();
 
-// Middleware
+// Middleware để parse JSON
 app.use(express.json());
 
-// Routes
-const userRoutes = require("./routes/user");
-app.use("/", userRoutes);
-
-// Start server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-});
+
+// Import user routes
+const userRoutes = require('./routes/user');
+app.use('/users', userRoutes);
+
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
