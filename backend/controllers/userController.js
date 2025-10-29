@@ -1,6 +1,6 @@
 let users = [
   { id: 1, name: "Huy", email: "huy@gmail.com" },
-  { id: 2, name: "Thanh", email: "thanh@gmail.com" }
+  { id: 2, name: "Phuc", email: "phuc@gmail.com" }
 ];
 
 // GET: lấy danh sách user
