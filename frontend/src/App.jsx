@@ -7,9 +7,9 @@ function App() {
   const [users, setUsers] = useState([]);
 
   const fetchUsers = () => {
-    axios.get("http://localhost:3000/users")
+    axios.get("http://localhost:5000/users")
       .then(res => setUsers(res.data))
-      .catch(err => console.error(err));
+      .catch(err => console.error("Lỗi khi tải users:", err));
   };
 
   useEffect(() => {
@@ -19,8 +19,11 @@ function App() {
   return (
     <div className="App">
       <h1>Quản lý User</h1>
+      {/* ✅ Truyền hàm fetchUsers xuống AddUser để thêm user xong thì reload danh sách */}
       <AddUser onUserAdded={fetchUsers} />
-      <UserList users={users} />
+
+      {/* ✅ Truyền cả users và fetchUsers xuống UserList để có thể cập nhật/xóa */}
+      <UserList users={users} fetchUsers={fetchUsers} />
     </div>
   );
 }
