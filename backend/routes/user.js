@@ -23,5 +23,12 @@ router.post('/', async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 });
+const userController = require('../controllers/userController');
+
+// Không cần /users ở đây nữa vì đã có app.use('/users', userRoutes)
+router.get('/', userController.getUsers);
+router.post('/', userController.createUser);
+router.put('/:id', userController.updateUser);
+router.delete('/:id', userController.deleteUser);
 
 module.exports = router;

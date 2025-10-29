@@ -1,5 +1,9 @@
 {
   "dependencies": {
+<<<<<<< HEAD
+=======
+    "cors": "^2.8.5",
+>>>>>>> backend
     "mongoose": "^8.19.2"
   }
 }
