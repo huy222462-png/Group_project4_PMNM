@@ -2,23 +2,19 @@ import React, { useState } from "react";
 import axios from "axios";
 
 const AddUser = ({ onUserAdded }) => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [userName, setUserName] = useState("");
+  const [userEmail, setUserEmail] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const newUser = { name: userName, email: userEmail };
 
-    if (!name || !email) {
-      alert("Vui lòng nhập đầy đủ name và email!");
-      return;
-    }
-
-    axios.post("http://localhost:3000/users", { name, email })
+    axios.post("http://localhost:3000/users", newUser)
       .then(res => {
         alert(res.data.message);
-        onUserAdded(); // thông báo App.jsx refresh danh sách
-        setName("");
-        setEmail("");
+        if (onUserAdded) onUserAdded(); // cập nhật danh sách
+        setUserName("");
+        setUserEmail("");
       })
       .catch(err => console.error(err));
   };
@@ -27,17 +23,17 @@ const AddUser = ({ onUserAdded }) => {
     <div>
       <h2>Thêm User</h2>
       <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Name"
-          value={name}
-          onChange={e => setName(e.target.value)}
+        <input 
+          type="text" 
+          placeholder="Name" 
+          value={userName} 
+          onChange={e => setUserName(e.target.value)} 
         />
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
+        <input 
+          type="email" 
+          placeholder="Email" 
+          value={userEmail} 
+          onChange={e => setUserEmail(e.target.value)} 
         />
         <button type="submit">Thêm</button>
       </form>

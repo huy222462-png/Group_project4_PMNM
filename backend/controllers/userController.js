@@ -1,26 +1,28 @@
-let users = []; // mảng tạm
+const User = require('../models/User');
 
-exports.getUsers = (req, res) => {
-  res.json(users);
+// GET /users
+exports.getUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
 
-exports.createUser = (req, res) => {
+// POST /users
+exports.createUser = async (req, res) => {
   const { name, email } = req.body;
-
   if (!name || !email) {
     return res.status(400).json({ message: "Thiếu name hoặc email" });
   }
 
-  const newUser = {
-    id: users.length + 1, // tạo id tự động
-    name,
-    email
-  };
+  const newUser = new User({ name, email });
 
-  users.push(newUser);
-
-  res.status(201).json({
-    message: "User added successfully",
-    data: newUser
-  });
+  try {
+    const savedUser = await newUser.save();  // lưu vào MongoDB
+    res.status(201).json({ message: "User added successfully", data: savedUser });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
