@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose'); // chay moongoose library
 
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
