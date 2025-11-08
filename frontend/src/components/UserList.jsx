@@ -40,7 +40,7 @@ const UserList = ({ users, fetchUsers }) => {
   return (
     <div>
       <h2>Danh sách User</h2>
-      {users.length === 0 ? (
+      {!users || users.length === 0 ? (
         <p>Chưa có user nào.</p>
       ) : (
         <ul style={{ listStyle: "none", padding: 0 }}>

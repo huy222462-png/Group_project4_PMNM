@@ -130,33 +130,168 @@ export const updateProfile = async (req, res) => {
   }
 };
 
-// ✅ Import các thư viện cần thiết
-const express = require('express');
-const cors = require('cors');
-const mongoose = require('mongoose');
-require('dotenv').config();
+// =====================================================
+// ADMIN FUNCTIONS
+// =====================================================
 
-// ✅ Import routes (nếu bạn đặt file routes là user.js)
-const userRoutes = require('./routes/user');
+// ✅ GET /api/users - Lấy danh sách tất cả users (Admin only)
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find().select("-password -__v");
+    
+    res.status(200).json({
+      success: true,
+      count: users.length,
+      data: users
+    });
+  } catch (error) {
+    console.error("Get all users error:", error);
+    res.status(500).json({ 
+      success: false,
+      message: "Server error while fetching users" 
+    });
+  }
+};
 
-const app = express();
+// ✅ GET /api/users/:id - Lấy thông tin 1 user (Admin only)
+export const getUserById = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select("-password -__v");
+    
+    if (!user) {
+      return res.status(404).json({ 
+        success: false,
+        message: "User not found" 
+      });
+    }
+    
+    res.status(200).json({
+      success: true,
+      data: user
+    });
+  } catch (error) {
+    console.error("Get user by ID error:", error);
+    res.status(500).json({ 
+      success: false,
+      message: "Server error while fetching user" 
+    });
+  }
+};
 
-// ✅ Middleware
-app.use(cors());
-app.use(express.json());
+// ✅ DELETE /api/users/:id - Xóa user (Admin hoặc tự xóa)
+export const deleteUser = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const currentUserId = req.user.id || req.user._id;
+    const currentUserRole = req.user.role;
 
-// ✅ Định tuyến API chuẩn nhóm
-app.use('/api', userRoutes);
+    // Tìm user cần xóa
+    const userToDelete = await User.findById(userId);
+    
+    if (!userToDelete) {
+      return res.status(404).json({ 
+        success: false,
+        message: "User not found" 
+      });
+    }
 
-// ✅ Debug: in ra URI kết nối
-console.log("Connecting to MongoDB with URI:", process.env.MONGO_URI);
+    // Kiểm tra quyền: Admin có thể xóa bất kỳ ai, user thường chỉ xóa chính mình
+    if (currentUserRole !== "admin" && userId !== currentUserId.toString()) {
+      return res.status(403).json({ 
+        success: false,
+        message: "You can only delete your own account" 
+      });
+    }
 
-// ✅ Kết nối MongoDB Atlas
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("✅ Connected to MongoDB Atlas"))
-  .catch(err => console.error("❌ MongoDB connection error:", err));
+    // Không cho phép xóa chính mình nếu là admin duy nhất
+    if (currentUserRole === "admin" && userId === currentUserId.toString()) {
+      const adminCount = await User.countDocuments({ role: "admin" });
+      if (adminCount <= 1) {
+        return res.status(403).json({ 
+          success: false,
+          message: "Cannot delete the last admin account" 
+        });
+      }
+    }
 
-// ✅ Chạy server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+    // Xóa user
+    await User.findByIdAndDelete(userId);
+    
+    res.status(200).json({
+      success: true,
+      message: "User deleted successfully"
+    });
+  } catch (error) {
+    console.error("Delete user error:", error);
+    res.status(500).json({ 
+      success: false,
+      message: "Server error while deleting user" 
+    });
+  }
+};
+
+// ✅ PUT /api/users/:id/role - Cập nhật role user (Admin only)
+export const updateUserRole = async (req, res) => {
+  try {
+    const { role } = req.body;
+    const userId = req.params.id;
+    const currentUserId = req.user.id || req.user._id;
+
+    // Validate role
+    if (!["user", "admin"].includes(role)) {
+      return res.status(400).json({ 
+        success: false,
+        message: "Invalid role. Must be 'user' or 'admin'" 
+      });
+    }
+
+    // Tìm user
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ 
+        success: false,
+        message: "User not found" 
+      });
+    }
+
+    // Không cho phép tự thay đổi role của chính mình
+    if (userId === currentUserId.toString()) {
+      return res.status(403).json({ 
+        success: false,
+        message: "You cannot change your own role" 
+      });
+    }
+
+    // Không cho phép hạ quyền admin cuối cùng
+    if (user.role === "admin" && role === "user") {
+      const adminCount = await User.countDocuments({ role: "admin" });
+      if (adminCount <= 1) {
+        return res.status(403).json({ 
+          success: false,
+          message: "Cannot demote the last admin" 
+        });
+      }
+    }
+
+    // Update role
+    user.role = role;
+    await user.save();
+
+    const updatedUser = user.toObject();
+    delete updatedUser.password;
+    delete updatedUser.__v;
+
+    res.status(200).json({
+      success: true,
+      message: `User role updated to ${role} successfully`,
+      data: updatedUser
+    });
+  } catch (error) {
+    console.error("Update user role error:", error);
+    res.status(500).json({ 
+      success: false,
+      message: "Server error while updating user role" 
+    });
+  }
+};
 

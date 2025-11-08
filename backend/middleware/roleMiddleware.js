@@ -1,4 +1,5 @@
-// middleware/roleMiddleware.js
+// middleware/roleMiddleware.js them file
+// Middleware phân quyền dựa trên vai trò người dùng
 export const authorizeRoles = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
