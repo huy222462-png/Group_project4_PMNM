@@ -129,33 +129,3 @@ export const updateProfile = async (req, res) => {
     });
   }
 };
-// GET /api/users (Admin)
-export const getAllUsers = async (req, res) => {
-  try {
-    const users = await User.find().select("-password");
-    res.status(200).json({ success: true, users });
-  } catch (error) {
-    console.error("Get users error:", error);
-    res.status(500).json({ success: false, message: "Server error" });
-  }
-};
-
-// DELETE /api/users/:id (Admin hoặc chính chủ)
-export const deleteUser = async (req, res) => {
-  try {
-    const userId = req.params.id;
-    if (req.user.role !== "admin" && req.user._id.toString() !== userId) {
-      return res.status(403).json({ message: "Access denied" });
-    }
-
-    const deletedUser = await User.findByIdAndDelete(userId);
-    if (!deletedUser) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    res.status(200).json({ success: true, message: "User deleted successfully" });
-  } catch (error) {
-    console.error("Delete user error:", error);
-    res.status(500).json({ success: false, message: "Server error" });
-  }
-};
