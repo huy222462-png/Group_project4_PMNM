@@ -42,6 +42,9 @@ const Navbar = () => {
               <button onClick={() => navigate("/")} className="nav-button">
                 Trang chủ
               </button>
+              <button onClick={() => navigate("/profile")} className="nav-button">
+                Profile
+              </button>
               <button onClick={handleLogout} className="nav-button logout-btn">
                 Đăng xuất
               </button>
