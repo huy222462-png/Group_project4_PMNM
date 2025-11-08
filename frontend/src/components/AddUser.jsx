@@ -9,7 +9,7 @@ const AddUser = ({ onUserAdded }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ⚠️ Kiểm tra trống
+    // Kiểm tra trống
     if (!userName.trim() || !userEmail.trim()) {
       alert("Vui lòng nhập đầy đủ họ tên và email!");
       return;
@@ -19,9 +19,10 @@ const AddUser = ({ onUserAdded }) => {
     setLoading(true);
 
     try {
+      // Gọi backend đúng port
       const res = await axios.post("http://localhost:5000/users", newUser);
       alert(res.data.message || "Thêm user thành công!");
-      if (onUserAdded) onUserAdded(); // tải lại danh sách
+      if (onUserAdded) onUserAdded(); // cập nhật danh sách
       setUserName("");
       setUserEmail("");
     } catch (err) {
