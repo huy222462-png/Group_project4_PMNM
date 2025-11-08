@@ -130,3 +130,9 @@ export const updateProfile = async (req, res) => {
   }
 };
 
+// ✅ Import các thư viện cần thiết
+const express = require('express');
+const cors = require('cors');
+const mongoose = require('mongoose');
+require('dotenv').config();
+
