@@ -53,3 +53,13 @@ export const login = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+// ✅ Đăng xuất
+export const logout = (req, res) => {
+  try {
+    console.log("✅ LOGOUT HANDLER CALLED - NO AUTH REQUIRED");
+    res.status(200).json({ message: "Logout successful" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
