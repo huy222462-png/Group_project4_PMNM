@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 
@@ -130,7 +129,7 @@ export const updateProfile = async (req, res) => {
     });
   }
 };
-=======
+
 // ✅ Import các thư viện cần thiết
 const express = require('express');
 const cors = require('cors');
@@ -160,4 +159,4 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
 // ✅ Chạy server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
->>>>>>> 1970feda3f2c455f85fb4be9ec819be6cf110e24
+
