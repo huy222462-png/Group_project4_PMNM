@@ -44,11 +44,42 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1d",
-    });
+    // Include role in JWT token
+    const token = jwt.sign(
+      { 
+        id: user._id,
+        role: user.role || "user"
+      }, 
+      process.env.JWT_SECRET, 
+      {
+        expiresIn: "1d",
+      }
+    );
 
-    res.status(200).json({ message: "Login successful", token });
+    // Return user info (without password)
+    const userInfo = {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role || "user",
+      avatar: user.avatar
+    };
+
+    res.status(200).json({ 
+      message: "Login successful", 
+      token,
+      user: userInfo
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// ✅ Đăng xuất
+export const logout = (req, res) => {
+  try {
+    console.log("✅ LOGOUT HANDLER CALLED - NO AUTH REQUIRED");
+    res.status(200).json({ message: "Logout successful" });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }

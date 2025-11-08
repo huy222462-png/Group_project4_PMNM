@@ -1,60 +1,51 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import Navbar from "./components/Navbar";
+import Home from "./components/Home";
+import Signup from "./components/Signup";
+import Login from "./components/Login";
+import Profile from "./components/Profile";
+import ProtectedRoute from "./components/ProtectedRoute";
+import "./App.css";
 
-const AddUser = ({ onUserAdded }) => {
-  const [userName, setUserName] = useState("");
-  const [userEmail, setUserEmail] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    // Kiểm tra trống
-    if (!userName.trim() || !userEmail.trim()) {
-      alert("Vui lòng nhập đầy đủ họ tên và email!");
-      return;
-    }
-
-    const newUser = { name: userName, email: userEmail };
-    setLoading(true);
-
-    try {
-      // Gọi backend đúng port
-      const res = await axios.post("http://localhost:5000/users", newUser);
-      alert(res.data.message || "Thêm user thành công!");
-      if (onUserAdded) onUserAdded(); // cập nhật danh sách
-      setUserName("");
-      setUserEmail("");
-    } catch (err) {
-      console.error("Lỗi khi thêm user:", err);
-      alert("Không thể thêm user. Vui lòng thử lại!");
-    } finally {
-      setLoading(false);
-    }
-  };
-
+function App() {
   return (
-    <div>
-      <h2>Thêm User</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Tên người dùng"
-          value={userName}
-          onChange={(e) => setUserName(e.target.value)}
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={userEmail}
-          onChange={(e) => setUserEmail(e.target.value)}
-        />
-        <button type="submit" disabled={loading}>
-          {loading ? "Đang thêm..." : "Thêm"}
-        </button>
-      </form>
-    </div>
-  );
-};
+    <AuthProvider>
+      <Router>
+        <div className="App">
+          <Navbar />
+          <Routes>
+            {/* Public routes */}
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/login" element={<Login />} />
 
-export default AddUser;
+            {/* Protected routes */}
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <Home />
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Redirect unknown routes to home */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </div>
+      </Router>
+    </AuthProvider>
+  );
+}
+
+export default App;
