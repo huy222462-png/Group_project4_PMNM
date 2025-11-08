@@ -1,0 +1,4 @@
+file .env
+PORT=5000
+MONGO_URI=mongodb+srv://H12345:Huy123@cluster0.v85kxtq.mongodb.net/pmnm_db?retryWrites=true&w=majority
+JWT_SECRET=secretkey123
