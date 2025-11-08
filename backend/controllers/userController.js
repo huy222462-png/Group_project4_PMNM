@@ -1,31 +1,29 @@
-import User from "../models/User.js";
+// ✅ Import các thư viện cần thiết
+const express = require('express');
+const cors = require('cors');
+const mongoose = require('mongoose');
+require('dotenv').config();
 
-// Lấy thông tin người dùng
-export const getProfile = async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id).select("-password");
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    res.json(user);
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-};
+// ✅ Import routes (nếu bạn đặt file routes là user.js)
+const userRoutes = require('./routes/user');
 
-// Cập nhật thông tin người dùng
-export const updateProfile = async (req, res) => {
-  try {
-    const { name, email } = req.body;
+const app = express();
 
-    const updatedUser = await User.findByIdAndUpdate(
-      req.user.id,
-      { name, email },
-      { new: true }
-    ).select("-password");
+// ✅ Middleware
+app.use(cors());
+app.use(express.json());
 
-    res.json(updatedUser);
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-};
+// ✅ Định tuyến API chuẩn nhóm
+app.use('/api', userRoutes);
+
+// ✅ Debug: in ra URI kết nối
+console.log("Connecting to MongoDB with URI:", process.env.MONGO_URI);
+
+// ✅ Kết nối MongoDB Atlas
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log("✅ Connected to MongoDB Atlas"))
+  .catch(err => console.error("❌ MongoDB connection error:", err));
+
+// ✅ Chạy server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
