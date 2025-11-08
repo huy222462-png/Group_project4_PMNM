@@ -38,6 +38,9 @@ const Navbar = () => {
             <>
               <span className="navbar-user">
                 Xin chào, {user?.name || user?.email || "User"}
+                {user?.role === "admin" && (
+                  <span className="admin-badge"> (Admin)</span>
+                )}
               </span>
               <button onClick={() => navigate("/")} className="nav-button">
                 Trang chủ
@@ -45,6 +48,11 @@ const Navbar = () => {
               <button onClick={() => navigate("/profile")} className="nav-button">
                 Profile
               </button>
+              {user?.role === "admin" && (
+                <button onClick={() => navigate("/admin")} className="nav-button admin-btn">
+                  Admin Panel
+                </button>
+              )}
               <button onClick={handleLogout} className="nav-button logout-btn">
                 Đăng xuất
               </button>

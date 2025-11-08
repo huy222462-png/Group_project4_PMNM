@@ -1,33 +1,41 @@
 import React, { useState } from "react";
-import axios from "axios";
+import { authAPI } from "../services/api";
 
 const AddUser = ({ onUserAdded }) => {
-  const [userName, setUserName] = useState("");
-  const [userEmail, setUserEmail] = useState("");
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: ""
+  });
   const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Kiểm tra trống
-    if (!userName.trim() || !userEmail.trim()) {
-      alert("Vui lòng nhập đầy đủ họ tên và email!");
+    if (!formData.name.trim() || !formData.email.trim() || !formData.password.trim()) {
+      alert("Vui lòng nhập đầy đủ họ tên, email và mật khẩu!");
       return;
     }
 
-    const newUser = { name: userName, email: userEmail };
     setLoading(true);
 
     try {
-      // Gọi backend đúng port
-      const res = await axios.post("http://localhost:5000/users", newUser);
-      alert(res.data.message || "Thêm user thành công!");
+      // Sử dụng authAPI.signup
+      const response = await authAPI.signup(formData.name, formData.email, formData.password);
+      alert(response.message || "Thêm user thành công!");
       if (onUserAdded) onUserAdded(); // cập nhật danh sách
-      setUserName("");
-      setUserEmail("");
+      setFormData({ name: "", email: "", password: "" });
     } catch (err) {
       console.error("Lỗi khi thêm user:", err);
-      alert("Không thể thêm user. Vui lòng thử lại!");
+      alert(err.response?.data?.message || "Không thể thêm user. Vui lòng thử lại!");
     } finally {
       setLoading(false);
     }
@@ -39,18 +47,27 @@ const AddUser = ({ onUserAdded }) => {
       <form onSubmit={handleSubmit}>
         <input
           type="text"
+          name="name"
           placeholder="Tên người dùng"
-          value={userName}
-          onChange={(e) => setUserName(e.target.value)}
+          value={formData.name}
+          onChange={handleChange}
         />
         <input
           type="email"
+          name="email"
           placeholder="Email"
-          value={userEmail}
-          onChange={(e) => setUserEmail(e.target.value)}
+          value={formData.email}
+          onChange={handleChange}
+        />
+        <input
+          type="password"
+          name="password"
+          placeholder="Mật khẩu"
+          value={formData.password}
+          onChange={handleChange}
         />
         <button type="submit" disabled={loading}>
-          {loading ? "Đang thêm..." : "Thêm"}
+          {loading ? "Đang thêm..." : "Thêm User"}
         </button>
       </form>
     </div>

@@ -70,6 +70,34 @@ export const authAPI = {
     const response = await api.put("/profile", data);
     return response.data;
   },
+
+  // =====================================================
+  // ADMIN APIs
+  // =====================================================
+  
+  // Lấy danh sách tất cả users (Admin only)
+  getAllUsers: async () => {
+    const response = await api.get("/users");
+    return response.data;
+  },
+
+  // Lấy thông tin user theo ID (Admin only)
+  getUserById: async (userId) => {
+    const response = await api.get(`/users/${userId}`);
+    return response.data;
+  },
+
+  // Xóa user (Admin hoặc tự xóa)
+  deleteUser: async (userId) => {
+    const response = await api.delete(`/users/${userId}`);
+    return response.data;
+  },
+
+  // Cập nhật role user (Admin only)
+  updateUserRole: async (userId, role) => {
+    const response = await api.put(`/users/${userId}/role`, { role });
+    return response.data;
+  },
 };
 
 export default api;
