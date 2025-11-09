@@ -6,6 +6,14 @@ dotenv.config();
 // 🧪 TEST MODE: Set to true để test mà không cần Gmail
 const TEST_MODE = process.env.EMAIL_TEST_MODE === "true";
 
+console.log(`📧 Email Service Mode: ${TEST_MODE ? 'TEST (console only)' : 'PRODUCTION (sending real emails)'}`);
+console.log(`📧 Email Configuration:`, {
+  host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+  port: process.env.EMAIL_PORT || 587,
+  user: process.env.EMAIL_USER ? '***' + process.env.EMAIL_USER.slice(-10) : 'NOT SET',
+  testMode: TEST_MODE
+});
+
 // ✅ Cấu hình Nodemailer với Gmail SMTP
 let transporter;
 
