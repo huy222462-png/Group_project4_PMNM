@@ -17,11 +17,27 @@ const allowedOrigins = [
   ...(process.env.CLIENT_URL || "").split(",").map(url => url.trim()).filter(Boolean) // Support multiple origins
 ].filter(Boolean); // Remove undefined values
 
+// Helper function to check if origin matches (supports wildcards)
+const isOriginAllowed = (origin) => {
+  if (!origin) return true; // Allow requests with no origin (Postman, mobile apps)
+  
+  return allowedOrigins.some(pattern => {
+    if (pattern === origin) return true; // Exact match
+    
+    // Wildcard matching: https://*.vercel.app matches https://xyz.vercel.app
+    if (pattern.includes('*')) {
+      const regex = new RegExp('^' + pattern.replace(/\*/g, '.*').replace(/\./g, '\\.') + '$');
+      return regex.test(origin);
+    }
+    
+    return false;
+  });
+};
+
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (mobile apps, Postman, etc.)
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (isOriginAllowed(origin)) {
         callback(null, true);
       } else {
         callback(new Error(`CORS Error: Origin ${origin} not allowed`));
