@@ -3,6 +3,8 @@ import { useAuth } from "../context/AuthContext";
 import axios from "axios";
 import "../styles/UploadAvatar.css";
 
+const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
 const UploadAvatar = ({ onUploadSuccess }) => {
   const { user, updateUser } = useAuth();
   const [selectedFile, setSelectedFile] = useState(null);
@@ -55,7 +57,7 @@ const UploadAvatar = ({ onUploadSuccess }) => {
 
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        "http://localhost:5000/api/upload-avatar",
+        `${API_BASE_URL}/api/upload-avatar`,
         formData,
         {
           headers: {
@@ -104,7 +106,7 @@ const UploadAvatar = ({ onUploadSuccess }) => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.delete(
-        "http://localhost:5000/api/delete-avatar",
+        `${API_BASE_URL}/api/delete-avatar`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
