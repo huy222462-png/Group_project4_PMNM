@@ -90,20 +90,26 @@ export const logout = (req, res) => {
 // ✅ Forgot Password - Gửi email với token reset
 export const forgotPassword = async (req, res) => {
   try {
+    console.log("📧 Forgot password request received for:", req.body.email);
+    
     const { email } = req.body;
 
     if (!email) {
+      console.log("❌ No email provided");
       return res.status(400).json({ message: "Email is required" });
     }
 
     const user = await User.findOne({ email });
     if (!user) {
+      console.log("⚠️ User not found for email:", email);
       // Không tiết lộ user có tồn tại hay không vì lý do bảo mật
       return res.status(200).json({ 
         message: "If the email exists, a password reset link has been sent" 
       });
     }
 
+    console.log("✅ User found, generating reset token...");
+    
     // Tạo reset token
     const resetToken = crypto.randomBytes(32).toString("hex");
     
@@ -117,22 +123,31 @@ export const forgotPassword = async (req, res) => {
     user.resetPasswordToken = hashedToken;
     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
     await user.save();
+    
+    console.log("✅ Token saved to database, sending email...");
 
     // Gửi email với token gốc (chưa hash)
     const emailResult = await sendPasswordResetEmail(email, resetToken);
 
     if (!emailResult.success) {
+      console.error("❌ Email sending failed:", emailResult.error);
       return res.status(500).json({ 
-        message: "Error sending email. Please try again later." 
+        message: "Error sending email. Please try again later.",
+        details: emailResult.error
       });
     }
 
+    console.log("✅ Password reset email sent successfully");
     res.status(200).json({ 
       message: "Password reset link has been sent to your email" 
     });
   } catch (error) {
     console.error("❌ Forgot password error:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error("❌ Error stack:", error.stack);
+    res.status(500).json({ 
+      message: "Server error",
+      error: process.env.NODE_ENV === 'production' ? undefined : error.message
+    });
   }
 };
 
