@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../context/AuthContext";
 import { authAPI } from "../services/api";
 import "../styles/AdminPanel.css";
@@ -11,7 +11,7 @@ const AdminPanel = () => {
   const [editingUserId, setEditingUserId] = useState(null);
   const [newRole, setNewRole] = useState("");
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
       console.log("🔍 Fetching users...");
@@ -37,7 +37,7 @@ const AdminPanel = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   // Fetch all users on component mount
   useEffect(() => {
