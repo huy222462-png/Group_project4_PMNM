@@ -44,6 +44,10 @@ app.use(
       }
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow all methods including OPTIONS
+    allowedHeaders: ['Content-Type', 'Authorization'], // Allow common headers
+    preflightContinue: false,
+    optionsSuccessStatus: 204
   })
 );
 
