@@ -1,6 +1,5 @@
 import React from "react";
 import { useAuth } from "../context/AuthContext";
-import AddUser from "./AddUser";
 import UserList from "./UserList";
 import "../styles/Home.css";
 
@@ -15,7 +14,6 @@ const Home = () => {
       </div>
 
       <div className="content-section">
-        <AddUser />
         <UserList />
       </div>
     </div>
