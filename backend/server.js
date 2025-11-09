@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 5000;
 // ✅ Cấu hình CORS linh hoạt - Đọc từ environment variable
 const allowedOrigins = [
   "http://localhost:3000", // Local development
-  process.env.CLIENT_URL || "https://your-project.vercel.app" // Production frontend
+  ...(process.env.CLIENT_URL || "").split(",").map(url => url.trim()).filter(Boolean) // Support multiple origins
 ].filter(Boolean); // Remove undefined values
 
 app.use(
