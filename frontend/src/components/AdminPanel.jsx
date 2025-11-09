@@ -11,11 +11,6 @@ const AdminPanel = () => {
   const [editingUserId, setEditingUserId] = useState(null);
   const [newRole, setNewRole] = useState("");
 
-  // Fetch all users
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
   const fetchUsers = async () => {
     try {
       setLoading(true);
@@ -43,6 +38,11 @@ const AdminPanel = () => {
       setLoading(false);
     }
   };
+
+  // Fetch all users on component mount
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   // Delete user
   const handleDeleteUser = async (userId, userName) => {
