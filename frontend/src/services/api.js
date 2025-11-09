@@ -1,14 +1,15 @@
 import axios from "axios";
 
-// Base URL cho backend API
-const API_BASE_URL = "http://localhost:5000/api";
+// Base URL cho backend API - Đọc từ environment variable
+const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 // Tạo axios instance với cấu hình mặc định
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: `${API_BASE_URL}/api`,
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true, // Enable cookies for CORS
 });
 
 // Interceptor để tự động thêm token vào header cho mỗi request

@@ -9,19 +9,20 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ✅ Cấu hình CORS linh hoạt
+// ✅ Cấu hình CORS linh hoạt - Đọc từ environment variable
 const allowedOrigins = [
-  "http://localhost:3000",
-  "https://tên-project.vercel.app" // thay bằng domain thật của bạn trên Vercel
-];
+  "http://localhost:3000", // Local development
+  process.env.CLIENT_URL || "https://your-project.vercel.app" // Production frontend
+].filter(Boolean); // Remove undefined values
 
 app.use(
   cors({
     origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, Postman, etc.)
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error("Not allowed by CORS"));
+        callback(new Error(`CORS Error: Origin ${origin} not allowed`));
       }
     },
     credentials: true,
