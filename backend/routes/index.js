@@ -45,14 +45,14 @@ router.delete("/delete-avatar", authenticate, deleteAvatar);
 // =====================================================
 // ADMIN ROUTES (Admin only)
 // =====================================================
-// Get all users
-router.get("/users", authenticate, authorizeRoles("admin"), getAllUsers);
+// Get all users (Authenticated users can view)
+router.get("/users", authenticate, getAllUsers);
 
-// Get user by ID
-router.get("/users/:id", authenticate, authorizeRoles("admin"), getUserById);
+// Get user by ID (Authenticated users can view)
+router.get("/users/:id", authenticate, getUserById);
 
-// Delete user (Admin or self)
-router.delete("/users/:id", authenticate, deleteUser);
+// Delete user (Admin only)
+router.delete("/users/:id", authenticate, authorizeRoles("admin"), deleteUser);
 
 // Update user role (Admin only)
 router.put("/users/:id/role", authenticate, authorizeRoles("admin"), updateUserRole);
