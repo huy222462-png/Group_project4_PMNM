@@ -14,8 +14,10 @@ import {
   deleteUser,
   updateUserRole
 } from "../controllers/userController.js";
+import { uploadAvatar, deleteAvatar } from "../controllers/uploadController.js";
 import { authenticate } from "../middleware/authMiddleware.js";
 import { authorizeRoles } from "../middleware/roleMiddleware.js";
+import upload from "../middleware/multerUpload.js";
 
 const router = express.Router();
 
@@ -33,6 +35,12 @@ router.post("/reset-password/:token", resetPassword);
 // =====================================================
 router.get("/profile", authenticate, getProfile);
 router.put("/profile", authenticate, updateProfile);
+
+// =====================================================
+// UPLOAD AVATAR ROUTES (Authenticated)
+// =====================================================
+router.post("/upload-avatar", authenticate, upload.single("avatar"), uploadAvatar);
+router.delete("/delete-avatar", authenticate, deleteAvatar);
 
 // =====================================================
 // ADMIN ROUTES (Admin only)

@@ -3,35 +3,125 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+// 🧪 TEST MODE: Set to true để test mà không cần Gmail
+const TEST_MODE = process.env.EMAIL_TEST_MODE === "true";
+
 // ✅ Cấu hình Nodemailer với Gmail SMTP
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER, // Email Gmail của bạn
-    pass: process.env.EMAIL_PASS, // App Password từ Gmail
-  },
-});
+let transporter;
+
+if (!TEST_MODE) {
+  transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER, // Email Gmail của bạn
+      pass: process.env.EMAIL_PASS, // App Password từ Gmail
+    },
+  });
+}
 
 // ✅ Gửi email reset password
 export const sendPasswordResetEmail = async (email, resetToken) => {
   const resetUrl = `http://localhost:3000/reset-password/${resetToken}`;
 
+  // 🧪 TEST MODE: Chỉ log ra console, không gửi email thật
+  if (TEST_MODE) {
+    console.log("\n" + "=".repeat(70));
+    console.log("🧪 TEST MODE - Email would be sent:");
+    console.log("=".repeat(70));
+    console.log(`📧 To: ${email}`);
+    console.log(`🔗 Reset Link: ${resetUrl}`);
+    console.log(`⏰ Token: ${resetToken}`);
+    console.log(`⌛ Expires: 1 hour`);
+    console.log("=".repeat(70) + "\n");
+    return { success: true };
+  }
+
+  // ✅ PRODUCTION MODE: Gửi email thật
   const mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: `"PMNM User Management" <${process.env.EMAIL_USER}>`,
     to: email,
-    subject: "Password Reset Request",
+    subject: "🔐 Password Reset Request - PMNM System",
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #333;">Password Reset Request</h2>
-        <p>You requested to reset your password. Click the link below to reset it:</p>
-        <a href="${resetUrl}" style="display: inline-block; padding: 10px 20px; margin: 20px 0; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
-          Reset Password
-        </a>
-        <p>This link will expire in 1 hour.</p>
-        <p>If you didn't request this, please ignore this email.</p>
-        <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
-        <p style="color: #666; font-size: 12px;">This is an automated email, please do not reply.</p>
-      </div>
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f4; padding: 20px;">
+          <tr>
+            <td align="center">
+              <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                
+                <!-- Header -->
+                <tr>
+                  <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; text-align: center;">
+                    <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 600;">🔐 Password Reset</h1>
+                    <p style="margin: 10px 0 0 0; color: #f0f0f0; font-size: 14px;">PMNM User Management System</p>
+                  </td>
+                </tr>
+                
+                <!-- Body -->
+                <tr>
+                  <td style="padding: 40px 30px;">
+                    <h2 style="margin: 0 0 20px 0; color: #333; font-size: 22px;">Hi there! 👋</h2>
+                    <p style="margin: 0 0 20px 0; color: #555; font-size: 16px; line-height: 1.6;">
+                      We received a request to reset your password. Click the button below to create a new password:
+                    </p>
+                    
+                    <!-- Button -->
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td align="center" style="padding: 20px 0;">
+                          <a href="${resetUrl}" style="display: inline-block; padding: 15px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; border-radius: 30px; font-size: 16px; font-weight: 600; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); transition: all 0.3s;">
+                            Reset My Password
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <!-- Alternative Link -->
+                    <p style="margin: 20px 0; color: #888; font-size: 13px; line-height: 1.6;">
+                      If the button doesn't work, copy and paste this link into your browser:
+                    </p>
+                    <p style="margin: 0 0 20px 0; padding: 15px; background-color: #f8f9fa; border-left: 4px solid #667eea; border-radius: 4px; word-break: break-all; font-size: 13px; color: #667eea;">
+                      ${resetUrl}
+                    </p>
+                    
+                    <!-- Warning -->
+                    <div style="margin: 30px 0; padding: 20px; background-color: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px;">
+                      <p style="margin: 0 0 10px 0; color: #856404; font-size: 14px; font-weight: 600;">⚠️ Important:</p>
+                      <ul style="margin: 0; padding-left: 20px; color: #856404; font-size: 13px; line-height: 1.6;">
+                        <li>This link will expire in <strong>1 hour</strong></li>
+                        <li>If you didn't request this, please ignore this email</li>
+                        <li>Your password will remain unchanged</li>
+                      </ul>
+                    </div>
+                  </td>
+                </tr>
+                
+                <!-- Footer -->
+                <tr>
+                  <td style="background-color: #f8f9fa; padding: 30px; text-align: center; border-top: 1px solid #e9ecef;">
+                    <p style="margin: 0 0 10px 0; color: #6c757d; font-size: 13px;">
+                      This is an automated message from <strong>PMNM User Management System</strong>
+                    </p>
+                    <p style="margin: 0; color: #adb5bd; font-size: 12px;">
+                      Please do not reply to this email
+                    </p>
+                    <p style="margin: 15px 0 0 0; color: #adb5bd; font-size: 11px;">
+                      © 2024 PMNM Team. All rights reserved.
+                    </p>
+                  </td>
+                </tr>
+                
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+      </html>
     `,
   };
 
