@@ -12,16 +12,36 @@ let transporter;
 if (!TEST_MODE) {
   transporter = nodemailer.createTransport({
     service: "gmail",
+    host: process.env.EMAIL_HOST || "smtp.gmail.com",
+    port: parseInt(process.env.EMAIL_PORT) || 587,
+    secure: false, // true for 465, false for other ports
     auth: {
       user: process.env.EMAIL_USER, // Email Gmail của bạn
       pass: process.env.EMAIL_PASS, // App Password từ Gmail
     },
+    tls: {
+      rejectUnauthorized: false // Accept self-signed certificates
+    },
+    connectionTimeout: 10000, // 10 seconds
+    greetingTimeout: 10000,
+    socketTimeout: 10000
+  });
+  
+  // Verify transporter on startup
+  transporter.verify((error, success) => {
+    if (error) {
+      console.error("❌ Email transporter verification failed:", error);
+    } else {
+      console.log("✅ Email server is ready to send messages");
+    }
   });
 }
 
 // ✅ Gửi email reset password
 export const sendPasswordResetEmail = async (email, resetToken) => {
-  const resetUrl = `http://localhost:3000/reset-password/${resetToken}`;
+  // Use production URL from environment variable, fallback to localhost for dev
+  const frontendUrl = process.env.CLIENT_URL?.split(',')[0] || 'http://localhost:3000';
+  const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
 
   // 🧪 TEST MODE: Chỉ log ra console, không gửi email thật
   if (TEST_MODE) {
