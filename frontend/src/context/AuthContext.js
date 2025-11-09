@@ -24,21 +24,37 @@ export const AuthProvider = ({ children }) => {
     const storedToken = localStorage.getItem("token");
     const storedUser = localStorage.getItem("user");
 
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
-      setIsAuthenticated(true);
+    if (storedToken && storedUser && storedUser !== "undefined") {
+      try {
+        setToken(storedToken);
+        setUser(JSON.parse(storedUser));
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error("Error parsing stored user:", error);
+        // Clear invalid data
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+      }
     }
     setLoading(false);
   }, []);
 
   // Đăng nhập: lưu token và user vào state + localStorage
   const login = (userData, authToken) => {
+    console.log("🔐 AuthContext.login called");
+    console.log("👤 userData:", userData);
+    console.log("🔑 authToken:", authToken);
+    
     setUser(userData);
     setToken(authToken);
     setIsAuthenticated(true);
     localStorage.setItem("token", authToken);
     localStorage.setItem("user", JSON.stringify(userData));
+    
+    console.log("✅ Saved to localStorage:", {
+      user: localStorage.getItem("user"),
+      token: localStorage.getItem("token")
+    });
   };
 
   // Đăng xuất: xóa token và user khỏi state + localStorage

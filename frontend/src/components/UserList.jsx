@@ -1,80 +1,109 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+import "../styles/UserList.css";
 
-const UserList = ({ users, fetchUsers }) => {
-  const [editingUser, setEditingUser] = useState(null);
-  const [editName, setEditName] = useState("");
-  const [editEmail, setEditEmail] = useState("");
+const UserList = () => {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  // 🗑 Xóa user
-  const handleDelete = async (id) => {
+  // Fetch users từ API
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
     try {
-      await axios.delete(`http://localhost:5000/users/${id}`);
-      fetchUsers(); // tải lại danh sách
-    } catch (err) {
-      console.error("Lỗi khi xóa user:", err);
-    }
-  };
-
-  // ✏️ Mở form sửa user
-  const handleEdit = (user) => {
-    setEditingUser(user);
-    setEditName(user.name);
-    setEditEmail(user.email);
-  };
-
-  // 💾 Cập nhật user
-  const handleUpdate = async () => {
-    try {
-      await axios.put(`http://localhost:5000/users/${editingUser._id || editingUser.id}`, {
-        name: editName,
-        email: editEmail,
+      setLoading(true);
+      setError("");
+      
+      const token = localStorage.getItem("token");
+      const response = await axios.get("http://localhost:5000/api/users", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
-      setEditingUser(null);
-      fetchUsers();
+      
+      setUsers(response.data.users || []);
     } catch (err) {
-      console.error("Lỗi khi cập nhật user:", err);
+      console.error("Lỗi khi tải danh sách user:", err);
+      setError(err.response?.data?.message || "Không thể tải danh sách người dùng");
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="user-list-container">
+        <h2>📋 Danh sách Người dùng</h2>
+        <p className="loading-text">Đang tải...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="user-list-container">
+        <h2>📋 Danh sách Người dùng</h2>
+        <p className="error-text">{error}</p>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <h2>Danh sách User</h2>
+    <div className="user-list-container">
+      <h2>📋 Danh sách Người dùng</h2>
+      
       {!users || users.length === 0 ? (
-        <p>Chưa có user nào.</p>
+        <p className="empty-text">Chưa có người dùng nào trong hệ thống.</p>
       ) : (
-        <ul style={{ listStyle: "none", padding: 0 }}>
-          {users.map((user) => (
-            <li key={user._id || user.id} style={{ marginBottom: "10px" }}>
-              {editingUser &&
-              (editingUser._id === user._id || editingUser.id === user.id) ? (
-                <div>
-                  <input
-                    type="text"
-                    value={editName}
-                    onChange={(e) => setEditName(e.target.value)}
-                    placeholder="Tên"
-                  />
-                  <input
-                    type="email"
-                    value={editEmail}
-                    onChange={(e) => setEditEmail(e.target.value)}
-                    placeholder="Email"
-                  />
-                  <button onClick={handleUpdate}>💾 Lưu</button>
-                  <button onClick={() => setEditingUser(null)}>❌ Hủy</button>
-                </div>
-              ) : (
-                <div>
-                  {user.name} - {user.email}{" "}
-                  <button onClick={() => handleEdit(user)}>✏️ Sửa</button>
-                  <button onClick={() => handleDelete(user._id || user.id)}>🗑 Xóa</button>
-                </div>
-              )}
-            </li>
-          ))}
-        </ul>
+        <div className="user-table-wrapper">
+          <table className="user-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Tên</th>
+                <th>Email</th>
+                <th>Vai trò</th>
+                <th>Ngày tạo</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((user, index) => (
+                <tr key={user._id || user.id}>
+                  <td>{index + 1}</td>
+                  <td>
+                    <div className="user-name">
+                      {user.avatar ? (
+                        <img src={user.avatar} alt={user.name} className="user-avatar-small" />
+                      ) : (
+                        <div className="user-avatar-placeholder">
+                          {user.name?.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      {user.name}
+                    </div>
+                  </td>
+                  <td>{user.email}</td>
+                  <td>
+                    <span className={`role-badge ${user.role}`}>
+                      {user.role === "admin" ? "Quản trị viên" : "Người dùng"}
+                    </span>
+                  </td>
+                  <td>
+                    {user.createdAt 
+                      ? new Date(user.createdAt).toLocaleDateString("vi-VN")
+                      : "N/A"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
+      
+      <p className="total-users">Tổng số: {users.length} người dùng</p>
     </div>
   );
 };

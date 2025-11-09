@@ -67,19 +67,16 @@ const Login = () => {
       // Gọi API đăng nhập
       const response = await authAPI.login(formData.email, formData.password);
 
-      // Lấy token từ response
-      const { token, message: successMessage } = response;
+      // Lấy token và user info từ response
+      const { token, user: userData, message: successMessage } = response;
+
+      console.log("🔍 Login response:", response);
+      console.log("👤 User data:", userData);
+      console.log("🔑 Token:", token);
 
       if (!token) {
         throw new Error("Token không hợp lệ");
       }
-
-      // Decode token để lấy user info (hoặc gọi API /profile)
-      // Ở đây ta tạm dùng email làm user info
-      const userData = {
-        email: formData.email,
-        // Có thể gọi thêm authAPI.getProfile() để lấy đầy đủ thông tin
-      };
 
       // Lưu token và user vào context + localStorage
       login(userData, token);
@@ -151,6 +148,12 @@ const Login = () => {
             {errors.password && (
               <span className="error-text">{errors.password}</span>
             )}
+          </div>
+
+          <div className="forgot-password-link">
+            <span onClick={() => navigate("/forgot-password")} className="auth-link">
+              Quên mật khẩu?
+            </span>
           </div>
 
           <button type="submit" className="auth-button" disabled={loading}>
