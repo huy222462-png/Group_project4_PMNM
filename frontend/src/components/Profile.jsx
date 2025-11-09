@@ -4,7 +4,7 @@ import { authAPI } from "../services/api";
 import "../styles/Profile.css";
 
 const Profile = () => {
-  const { user, updateUser } = useAuth();
+  const { updateUser } = useAuth();
   
   // State cho View mode và Edit mode
   const [isEditing, setIsEditing] = useState(false);
