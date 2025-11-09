@@ -21,6 +21,9 @@ const allowedOrigins = [
 const isOriginAllowed = (origin) => {
   if (!origin) return true; // Allow requests with no origin (Postman, mobile apps)
   
+  // Allow all Vercel deployments (production, preview, development)
+  if (origin && origin.includes('.vercel.app')) return true;
+  
   return allowedOrigins.some(pattern => {
     if (pattern === origin) return true; // Exact match
     
