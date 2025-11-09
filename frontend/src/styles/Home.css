@@ -1,0 +1,119 @@
+/* Home.css - Styles for home/dashboard page */
+
+.home-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
+
+.welcome-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 40px;
+  border-radius: 12px;
+  margin-bottom: 40px;
+  box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+}
+
+.welcome-section h2 {
+  margin: 0 0 12px 0;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.welcome-section p {
+  margin: 0;
+  font-size: 16px;
+  opacity: 0.95;
+}
+
+/* Profile Avatar Section */
+.profile-section {
+  margin-top: 30px;
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  padding-top: 30px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.current-avatar {
+  flex-shrink: 0;
+}
+
+.avatar-display {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.avatar-placeholder {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  border: 4px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  font-weight: 700;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.content-section {
+  width: 100%;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  font-size: 18px;
+  color: #666;
+}
+
+/* Responsive */
+@media (max-width: 968px) {
+  .content-section {
+    grid-template-columns: 1fr;
+  }
+  
+  .profile-section {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-container {
+    padding: 20px 16px;
+  }
+
+  .welcome-section {
+    padding: 30px 20px;
+  }
+
+  .welcome-section h2 {
+    font-size: 24px;
+  }
+
+  .welcome-section p {
+    font-size: 14px;
+  }
+  
+  .avatar-display,
+  .avatar-placeholder {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .avatar-placeholder {
+    font-size: 40px;
+  }
+}
